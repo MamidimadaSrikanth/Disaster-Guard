@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DisasterGuard: Intelligent Disaster Management System</title>
+  <meta name="description" content="DisasterGuard helps you during floods, earthquakes, cyclones and accidents — find shelters, safe roads, medical help and emergency supplies instantly." />
+  <meta name="theme-color" content="#050810" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <!-- Leaflet Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ALERT TICKER -->
+  <div class="alert-ticker" id="alertTicker">
+    <span class="ticker-label">⚡ LIVE ALERTS</span>
+    <div class="ticker-track">
+      <div class="ticker-content" id="tickerContent">
+        🔴 FLOOD WARNING: Coastal areas of Tamil Nadu — Evacuate immediately &nbsp;|&nbsp;
+        🟠 CYCLONE ALERT: Category 3 approaching Odisha coast — Take shelter &nbsp;|&nbsp;
+        🔴 EARTHQUAKE: Magnitude 5.2 recorded near Delhi NCR — Stay indoors &nbsp;|&nbsp;
+        🟡 ROAD CLOSURE: NH-44 blocked due to landslide near Manali &nbsp;|&nbsp;
+        🔴 NDRF DEPLOYED: 20 teams dispatched to flood-affected regions &nbsp;|&nbsp;
+        🟢 SHELTER OPEN: 3 new relief camps opened in Chennai — Capacity: 5000 &nbsp;|&nbsp;
+        🔴 FLOOD WARNING: Coastal areas of Tamil Nadu — Evacuate immediately &nbsp;|&nbsp;
+        🟠 CYCLONE ALERT: Category 3 approaching Odisha coast — Take shelter &nbsp;|&nbsp;
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-brand" onclick="scrollToSection('hero')">
+      <div class="brand-icon">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="20" cy="20" r="18" stroke="#ff3b30" stroke-width="2"/>
+          <path d="M20 8 L20 32 M8 20 L32 20" stroke="#ff3b30" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="20" cy="20" r="5" fill="#ff3b30"/>
+        </svg>
+      </div>
+      <div>
+        <span class="brand-name">DisasterGuard</span>
+        <span class="brand-tagline">Emergency Response System</span>
+      </div>
+    </div>
+    <button class="nav-toggle" aria-label="Open navigation menu" aria-expanded="false" onclick="toggleMobileNav()">☰</button>
+    <div class="nav-links" id="navLinks">
+      <a class="nav-link" onclick="scrollToSection('dashboard')">Dashboard</a>
+      <a class="nav-link" onclick="scrollToSection('shelters')">Shelters</a>
+      <a class="nav-link" onclick="scrollToSection('livemap')">Live Map</a>
+      <a class="nav-link" onclick="scrollToSection('safeRoutes')">Safe Routes</a>
+      <a class="nav-link" onclick="scrollToSection('medical')">Medical</a>
+      <a class="nav-link" onclick="scrollToSection('supplies')">Supplies</a>
+      <a class="nav-link" onclick="scrollToSection('assistant')">AI Assistants</a>
+      <a class="nav-link" onclick="scrollToSection('registerRescued')">Register Rescued</a>
+      <a class="nav-link" onclick="scrollToSection('foodRegistration')">Food Registration</a>
+    </div>
+    <div class="nav-status">
+      <div class="status-dot"></div>
+      <span class="status-text">System Active</span>
+      <div class="live-clock" id="liveClock">00:00:00</div>
+    </div>
+    <div class="nav-backdrop" id="navBackdrop" onclick="closeMobileNav()" aria-hidden="true"></div>
+    <button class="nav-sos-btn" onclick="triggerSOS()">🆘 SOS</button>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="hero" id="hero">
+    <div class="hero-bg-grid"></div>
+    <div class="hero-particles" id="heroParticles"></div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        AI-Powered · Agents for Good Track · Capstone Project
+      </div>
+      <h1 class="hero-title">
+        When Disaster Strikes,<br/>
+        <span class="hero-gradient">DisasterGuard</span> Responds
+      </h1>
+      <p class="hero-desc">
+        Real-time AI guidance for shelters, safe routes, medical help &amp; emergency supplies<br/>
+        during Floods, Earthquakes, Cyclones &amp; Accidents.
+      </p>
+
+      <!-- DISASTER TYPE SELECTOR -->
+      <div class="disaster-selector">
+        <p class="selector-label">SELECT ACTIVE DISASTER TYPE</p>
+        <div class="disaster-buttons">
+          <button class="disaster-btn active" id="btn-flood" onclick="selectDisaster('flood')">
+            <span class="disaster-icon">🌊</span><span class="disaster-name">Flood</span>
+          </button>
+          <button class="disaster-btn" id="btn-earthquake" onclick="selectDisaster('earthquake')">
+            <span class="disaster-icon">🏔️</span><span class="disaster-name">Earthquake</span>
+          </button>
+          <button class="disaster-btn" id="btn-cyclone" onclick="selectDisaster('cyclone')">
+            <span class="disaster-icon">🌀</span><span class="disaster-name">Cyclone</span>
+          </button>
+          <button class="disaster-btn" id="btn-accident" onclick="selectDisaster('accident')">
+            <span class="disaster-icon">🚨</span><span class="disaster-name">Accident</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- QUICK ACTIONS -->
+      <div class="quick-actions">
+        <button class="sos-button" id="sosBtn" onclick="triggerSOS()">
+          <div class="sos-ring"></div>
+          <div class="sos-ring sos-ring-2"></div>
+          <span class="sos-text">SOS</span>
+        </button>
+        <div class="quick-cards">
+          <div class="quick-card" onclick="scrollToSection('shelters')">
+            <div class="qc-icon">🏠</div>
+            <div class="qc-label">Find Shelter</div>
+            <div class="qc-count" id="shelterCount">12 Nearby</div>
+          </div>
+          <div class="quick-card" onclick="scrollToSection('livemap')">
+            <div class="qc-icon">🗺️</div>
+            <div class="qc-label">Live Map</div>
+            <div class="qc-count" id="routeCount">4 Open Routes</div>
+          </div>
+          <div class="quick-card" onclick="scrollToSection('medical')">
+            <div class="qc-icon">🏥</div>
+            <div class="qc-label">Medical Help</div>
+            <div class="qc-count">24/7 Available</div>
+          </div>
+          <div class="quick-card" onclick="scrollToSection('volunteer')">
+            <div class="qc-icon">🤝</div>
+            <div class="qc-label">Volunteer Task</div>
+            <div class="qc-count">Join Now</div>
+          </div>
+          <div class="quick-card" onclick="scrollToSection('assistant')">
+            <div class="qc-icon">🤖</div>
+            <div class="qc-label">AI Assistant</div>
+            <div class="qc-count">Ask Anything</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DISASTER STATUS PANEL -->
+    <div class="disaster-status-panel" id="disasterStatusPanel">
+      <div class="dsp-header">
+        <div class="dsp-icon" id="dspIcon">🌊</div>
+        <div>
+          <div class="dsp-title" id="dspTitle">FLOOD ALERT</div>
+          <div class="dsp-severity severity-high" id="dspSeverity">HIGH SEVERITY</div>
+        </div>
+      </div>
+      <div class="dsp-stats">
+        <div class="dsp-stat">
+          <div class="dsp-stat-val" id="dspAffected">2.4M</div>
+          <div class="dsp-stat-label">Affected</div>
+        </div>
+        <div class="dsp-stat">
+          <div class="dsp-stat-val" id="dspShelters">847</div>
+          <div class="dsp-stat-label">Shelters</div>
+        </div>
+        <div class="dsp-stat">
+          <div class="dsp-stat-val" id="dspTeams">120</div>
+          <div class="dsp-stat-label">NDRF Teams</div>
+        </div>
+      </div>
+      <div class="dsp-advisory" id="dspAdvisory">
+        Move to higher ground immediately. Avoid walking through floodwater — even 6 inches can knock you down.
+      </div>
+      <button class="dsp-location-btn" onclick="getUserLocation()">
+        📍 Detect My Location
+      </button>
+      <div class="dsp-location-result" id="locationResult" style="display:none"></div>
+    </div>
+  </section>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <!-- LIVE DASHBOARD -->
+    <section class="section" id="dashboard">
+      <div class="section-header">
+        <div class="section-icon">📊</div>
+        <div>
+          <h2 class="section-title">Live Response Dashboard</h2>
+          <p class="section-desc">Real-time disaster metrics and resource deployment status</p>
+        </div>
+        <div class="section-badge" id="dashBadge">🟢 Updating Live</div>
+      </div>
+      <div class="dashboard-grid">
+        <div class="dash-metric-card" id="dashCard1">
+          <div class="dash-metric-icon">👥</div>
+          <div class="dash-metric-val" id="dashM1">2,400,000</div>
+          <div class="dash-metric-label">People Affected</div>
+          <div class="dash-metric-trend trend-up" id="dashT1">↑ +12% from yesterday</div>
+        </div>
+        <div class="dash-metric-card" id="dashCard2">
+          <div class="dash-metric-icon">🏠</div>
+          <div class="dash-metric-val" id="dashM2">847</div>
+          <div class="dash-metric-label">Active Shelters</div>
+          <div class="dash-metric-trend trend-up" id="dashT2">↑ +23 opened today</div>
+        </div>
+        <div class="dash-metric-card" id="dashCard3">
+          <div class="dash-metric-icon">🛡️</div>
+          <div class="dash-metric-val" id="dashM3">120</div>
+          <div class="dash-metric-label">NDRF Teams Deployed</div>
+          <div class="dash-metric-trend trend-neutral" id="dashT3">→ Stable deployment</div>
+        </div>
+        <div class="dash-metric-card" id="dashCard4">
+          <div class="dash-metric-icon">🚑</div>
+          <div class="dash-metric-val" id="dashM4">340</div>
+          <div class="dash-metric-label">Rescues Today</div>
+          <div class="dash-metric-trend trend-up" id="dashT4">↑ +45 in last hour</div>
+        </div>
+        <div class="dash-metric-card" id="dashCard5">
+          <div class="dash-metric-icon">🏥</div>
+          <div class="dash-metric-val" id="dashM5">18</div>
+          <div class="dash-metric-label">Hospitals on Alert</div>
+          <div class="dash-metric-trend trend-neutral" id="dashT5">→ All operational</div>
+        </div>
+        <div class="dash-metric-card" id="dashCard6">
+          <div class="dash-metric-icon">🛣️</div>
+          <div class="dash-metric-val" id="dashM6">34</div>
+          <div class="dash-metric-label">Road Closures</div>
+          <div class="dash-metric-trend trend-down" id="dashT6">↓ -5 cleared today</div>
+        </div>
+      </div>
+
+      <!-- NDRF DEPLOYMENT MAP / STATUS BARS -->
+      <div class="dashboard-status-row">
+        <div class="status-panel">
+          <h3 class="status-panel-title">⚡ Emergency Response Status</h3>
+          <div class="response-bars" id="responseBars">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+        <div class="status-panel">
+          <h3 class="status-panel-title">📻 Live Incident Feed</h3>
+          <div class="incident-feed" id="incidentFeed">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+        <div class="status-panel">
+          <h3 class="status-panel-title">🌦️ Weather Conditions</h3>
+          <div class="weather-panel" id="weatherPanel">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SHELTER FINDER -->
+    <section class="section" id="shelters">
+      <div class="section-header">
+        <div class="section-icon">🏠</div>
+        <div>
+          <h2 class="section-title">Shelter Finder</h2>
+          <p class="section-desc">Nearest verified emergency shelters with real-time capacity</p>
+        </div>
+        <div class="section-badge" id="shelterBadge">12 Active Shelters</div>
+      </div>
+      <div class="shelter-filters">
+        <button class="filter-btn active" onclick="filterShelters('all',this)">All</button>
+        <button class="filter-btn" onclick="filterShelters('open',this)">Open</button>
+        <button class="filter-btn" onclick="filterShelters('medical',this)">Has Medical</button>
+        <button class="filter-btn" onclick="filterShelters('food',this)">Has Food</button>
+        <button class="filter-btn" onclick="filterShelters('available',this)">Space Available</button>
+      </div>
+      <div class="shelter-grid" id="shelterGrid"></div>
+    </section>
+
+    <!-- LIVE MAP -->
+    <section class="section" id="livemap">
+      <div class="section-header">
+        <div class="section-icon">🗺️</div>
+        <div>
+          <h2 class="section-title">Interactive Live Map</h2>
+          <p class="section-desc">Real-time shelter locations, safe routes & hazard zones</p>
+        </div>
+        <div class="map-controls-bar">
+          <button class="map-ctrl-btn active" onclick="toggleMapLayer('shelters',this)">🏠 Shelters</button>
+          <button class="map-ctrl-btn active" onclick="toggleMapLayer('hospitals',this)">🏥 Hospitals</button>
+          <button class="map-ctrl-btn active" onclick="toggleMapLayer('hazards',this)">⚠️ Hazards</button>
+          <button class="map-ctrl-btn" onclick="centerMyLocation()">📍 My Location</button>
+        </div>
+      </div>
+      <div class="map-wrapper">
+        <div id="leafletMap"></div>
+        <div class="map-legend-overlay">
+          <div class="mlo-item"><span class="mlo-dot" style="background:#30d158"></span>Shelter (Open)</div>
+          <div class="mlo-item"><span class="mlo-dot" style="background:#ff9500"></span>Shelter (Limited)</div>
+          <div class="mlo-item"><span class="mlo-dot" style="background:#ff3b30"></span>Shelter (Full)</div>
+          <div class="mlo-item"><span class="mlo-dot" style="background:#0a84ff"></span>Hospital</div>
+          <div class="mlo-item"><span class="mlo-dot" style="background:#bf5af2"></span>Hazard Zone</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SAFE ROUTES -->
+    <section class="section" id="safeRoutes">
+      <div class="section-header">
+        <div class="section-icon">🛣️</div>
+        <div>
+          <h2 class="section-title">Safe Routes</h2>
+          <p class="section-desc">Recommended evacuation roads and shelter access paths for the current emergency</p>
+        </div>
+      </div>
+      <div class="service-grid">
+        <div class="service-card">
+          <div class="service-card-header">
+            <h3 class="card-title">🧭 Route Guidance</h3>
+            <div class="service-chip" id="activeRouteBadge">Recommended</div>
+          </div>
+          <div class="service-summary" id="safeRoutesSummary"></div>
+          <div class="route-list" id="safeRouteList"></div>
+        </div>
+        <div class="service-card">
+          <h3 class="card-title">📌 Quick Route Checklist</h3>
+          <ul class="check-list">
+            <li>Keep your phone charged and share your route with family.</li>
+            <li>Choose the nearest shelter on higher ground if road conditions worsen.</li>
+            <li>Avoid low-lying roads, underpasses, and coastal areas.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- REGISTER RESCUED -->
+    <section class="section" id="registerRescued">
+      <div class="section-header">
+        <div class="section-icon">🆘</div>
+        <div>
+          <h2 class="section-title">Register Rescued</h2>
+          <p class="section-desc">Log rescued people quickly so volunteers can coordinate support</p>
+        </div>
+      </div>
+      <div class="service-grid">
+        <div class="service-card">
+          <h3 class="card-title">📝 Rescue Registration Form</h3>
+          <form id="rescuedForm" class="service-form" onsubmit="registerRescued(event)">
+            <div class="form-grid">
+              <label>
+                <span>Name</span>
+                <input type="text" name="name" placeholder="Person name" required />
+              </label>
+              <label>
+                <span>Age</span>
+                <input type="number" name="age" min="1" max="120" placeholder="Age" required />
+              </label>
+              <label>
+                <span>Location</span>
+                <input type="text" name="location" placeholder="Nearest area" required />
+              </label>
+              <label>
+                <span>Condition</span>
+                <select name="condition">
+                  <option value="Stable">Stable</option>
+                  <option value="Needs medical">Needs medical</option>
+                  <option value="Critical">Critical</option>
+                </select>
+              </label>
+            </div>
+            <label>
+              <span>Notes</span>
+              <textarea name="notes" rows="3" placeholder="Extra details for responders"></textarea>
+            </label>
+            <button type="submit" class="submit-btn">Register rescued person</button>
+          </form>
+        </div>
+        <div class="service-card">
+          <div class="service-card-header">
+            <h3 class="card-title">📋 Rescue Log</h3>
+            <div class="service-chip" id="rescuedSummary">0 registered</div>
+          </div>
+          <div class="result-list" id="rescuedList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOD REGISTRATION -->
+    <section class="section" id="foodRegistration">
+      <div class="section-header">
+        <div class="section-icon">🥫</div>
+        <div>
+          <h2 class="section-title">Food Registration</h2>
+          <p class="section-desc">Track food packets and relief supplies for shelters and affected families</p>
+        </div>
+      </div>
+      <div class="service-grid">
+        <div class="service-card">
+          <h3 class="card-title">🍱 Food Distribution Form</h3>
+          <form id="foodForm" class="service-form" onsubmit="registerFood(event)">
+            <div class="form-grid">
+              <label>
+                <span>Contact Name</span>
+                <input type="text" name="name" placeholder="Volunteer / Donor Name" required />
+              </label>
+              <label>
+                <span>Phone Number</span>
+                <input type="tel" name="phone" placeholder="Contact number" required />
+              </label>
+              <label>
+                <span>Shelter / Area</span>
+                <input type="text" name="area" placeholder="Shelter or area name" required />
+              </label>
+              <label>
+                <span>Food Items</span>
+                <input type="text" name="items" placeholder="Rice, water, biscuits" required />
+              </label>
+              <label>
+                <span>Quantity</span>
+                <input type="number" name="quantity" min="1" placeholder="Packets / boxes" required />
+              </label>
+              <label>
+                <span>Status</span>
+                <select name="status">
+                  <option value="Prepared">Prepared</option>
+                  <option value="In transit">In transit</option>
+                  <option value="Delivered">Delivered</option>
+                </select>
+              </label>
+            </div>
+            <label>
+              <span>Volunteer / Notes</span>
+              <textarea name="notes" rows="3" placeholder="Volunteer name or delivery notes"></textarea>
+            </label>
+            <button type="submit" class="submit-btn">Register food support</button>
+          </form>
+        </div>
+        <div class="service-card">
+          <div class="service-card-header">
+            <h3 class="card-title">📦 Food Support Log</h3>
+            <div class="service-chip" id="foodSummary">0 entries</div>
+          </div>
+          <div class="result-list" id="foodList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MEDICAL HELP -->
+    <section class="section" id="medical">
+      <div class="section-header">
+        <div class="section-icon">🏥</div>
+        <div>
+          <h2 class="section-title">Medical Help Center</h2>
+          <p class="section-desc">Emergency contacts, hospitals &amp; first aid guides</p>
+        </div>
+      </div>
+      <div class="medical-grid">
+        <div class="medical-card emergency-contacts">
+          <h3 class="card-title">⚡ Emergency Contacts</h3>
+          <div class="contact-list">
+            <div class="contact-item" onclick="callNumber('112')"><div class="contact-icon">🚨</div><div class="contact-info"><div class="contact-name">National Emergency</div><div class="contact-number">112</div></div><button class="call-btn">CALL</button></div>
+            <div class="contact-item" onclick="callNumber('108')"><div class="contact-icon">🚑</div><div class="contact-info"><div class="contact-name">Ambulance</div><div class="contact-number">108</div></div><button class="call-btn">CALL</button></div>
+            <div class="contact-item" onclick="callNumber('101')"><div class="contact-icon">🔥</div><div class="contact-info"><div class="contact-name">Fire Brigade</div><div class="contact-number">101</div></div><button class="call-btn">CALL</button></div>
+            <div class="contact-item" onclick="callNumber('100')"><div class="contact-icon">👮</div><div class="contact-info"><div class="contact-name">Police</div><div class="contact-number">100</div></div><button class="call-btn">CALL</button></div>
+            <div class="contact-item" onclick="callNumber('1078')"><div class="contact-icon">🛡️</div><div class="contact-info"><div class="contact-name">NDRF Helpline</div><div class="contact-number">1078</div></div><button class="call-btn">CALL</button></div>
+            <div class="contact-item" onclick="callNumber('1070')"><div class="contact-icon">🌊</div><div class="contact-info"><div class="contact-name">Disaster Mgmt</div><div class="contact-number">1070</div></div><button class="call-btn">CALL</button></div>
+          </div>
+        </div>
+        <div class="medical-card hospitals-card">
+          <h3 class="card-title">🏥 Nearest Hospitals</h3>
+          <div class="hospital-list" id="hospitalList"></div>
+        </div>
+        <div class="medical-card first-aid-card">
+          <h3 class="card-title">🩺 First Aid Guide</h3>
+          <div class="firstaid-tabs">
+            <button class="fa-tab active" onclick="showFirstAid('flood')" id="fa-flood">Flood</button>
+            <button class="fa-tab" onclick="showFirstAid('earthquake')" id="fa-earthquake">Earthquake</button>
+            <button class="fa-tab" onclick="showFirstAid('cyclone')" id="fa-cyclone">Cyclone</button>
+            <button class="fa-tab" onclick="showFirstAid('accident')" id="fa-accident">Accident</button>
+          </div>
+          <div class="firstaid-content" id="firstAidContent"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EMERGENCY SUPPLIES -->
+    <section class="section" id="supplies">
+      <div class="section-header">
+        <div class="section-icon">📦</div>
+        <div>
+          <h2 class="section-title">Emergency Supplies Checklist</h2>
+          <p class="section-desc">Track what you have &amp; what you still need</p>
+        </div>
+        <div class="supply-progress-wrap">
+          <div class="supply-progress-label">Preparedness: <span id="progressPct">0%</span></div>
+          <div class="supply-progress-bar"><div class="supply-progress-fill" id="progressFill"></div></div>
+          <div class="supply-actions">
+            <button class="supply-action-btn" onclick="markAllSupplies()">✅ Mark All</button>
+            <button class="supply-action-btn" onclick="clearAllSupplies()">🧹 Clear All</button>
+            <button class="print-btn" onclick="printChecklist()">🖨️ Print</button>
+          </div>
+        </div>
+      </div>
+      <div class="supplies-grid" id="suppliesGrid"></div>
+    </section>
+
+    <!-- EVACUATION GUIDE -->
+    <section class="section" id="evacuation">
+      <div class="section-header">
+        <div class="section-icon">🚶</div>
+        <div>
+          <h2 class="section-title">Evacuation Guide</h2>
+          <p class="section-desc">Step-by-step evacuation plan for your disaster scenario</p>
+        </div>
+        <div class="section-badge" id="evacBadge">Flood Mode</div>
+      </div>
+      <div class="evac-container">
+        <div class="evac-steps" id="evacSteps"></div>
+        <div class="evac-sidebar">
+          <div class="evac-dos-donts">
+            <div class="dos-card">
+              <h4 class="dos-title">✅ DO's</h4>
+              <ul class="dos-list" id="dosList"></ul>
+            </div>
+            <div class="donts-card">
+              <h4 class="donts-title">❌ DON'Ts</h4>
+              <ul class="donts-list" id="dontsList"></ul>
+            </div>
+          </div>
+          <div class="evac-hotlines">
+            <h4 class="hotlines-title">📞 Evacuation Helplines</h4>
+            <div class="hotline-item"><span>NDRF Control Room</span><strong>011-24363260</strong></div>
+            <div class="hotline-item"><span>PM Relief Fund</span><strong>1800-180-3030</strong></div>
+            <div class="hotline-item"><span>Red Cross India</span><strong>011-23711551</strong></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMMUNITY REPORTS -->
+    <section class="section" id="community">
+      <div class="section-header">
+        <div class="section-icon">📢</div>
+        <div>
+          <h2 class="section-title">Community Reports</h2>
+          <p class="section-desc">Crowdsourced ground-level information from affected people</p>
+        </div>
+        <button class="add-report-btn" onclick="openReportModal()">+ Add Report</button>
+      </div>
+      <div class="community-controls">
+        <div class="report-search-wrap">
+          <input type="text" id="reportSearch" class="report-search-input" placeholder="Search reports by location or description..." oninput="updateReportSearch()" />
+          <button class="clear-search-btn" onclick="clearReportSearch()">✕</button>
+        </div>
+        <div class="community-filter-row">
+          <div class="filter-label">Filter:</div>
+          <button class="report-filter-btn active" data-filter="all" onclick="setReportFilter('all', this)">All</button>
+          <button class="report-filter-btn" data-filter="road" onclick="setReportFilter('road', this)">Road</button>
+          <button class="report-filter-btn" data-filter="flood" onclick="setReportFilter('flood', this)">Flood</button>
+          <button class="report-filter-btn" data-filter="shelter" onclick="setReportFilter('shelter', this)">Shelter</button>
+          <button class="report-filter-btn" data-filter="medical" onclick="setReportFilter('medical', this)">Medical</button>
+          <button class="report-filter-btn" data-filter="rescue" onclick="setReportFilter('rescue', this)">Rescue</button>
+          <select id="reportSeverityFilter" class="report-severity-select" onchange="setSeverityFilter(this.value)">
+            <option value="all">All Severities</option>
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+            <option value="critical">Critical</option>
+          </select>
+        </div>
+      </div>
+      <div class="community-layout">
+        <div class="report-feed" id="reportFeed"></div>
+        <div class="report-stats-panel">
+          <h3 class="rsp-title">📊 Report Summary</h3>
+          <div class="rsp-stats" id="rspStats"></div>
+          <div class="rsp-heatmap">
+            <h4 style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--text-secondary)">Active Zones</h4>
+            <div id="activeZones"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- AI ASSISTANT -->
+    <section class="section" id="assistant">
+      <div class="section-header">
+        <div class="section-icon">🤖</div>
+        <div>
+          <h2 class="section-title">DisasterGuard Assistant</h2>
+          <p class="section-desc">Ask anything about your emergency situation — powered by AI</p>
+        </div>
+        <div class="ai-status-badge"><span class="ai-dot"></span>AI Online</div>
+      </div>
+      <div class="chat-container">
+        <div class="chat-messages" id="chatMessages">
+          <div class="chat-message ai-message">
+            <div class="ai-avatar">🤖</div>
+            <div class="message-bubble">
+              <div class="message-text">
+                Hello! I'm <strong>DisasterGuard</strong>, your emergency response assistant. I'm currently monitoring a <span id="activeDisasterText" class="disaster-highlight">Flood Alert</span> in your area.<br/><br/>
+                How can I help you right now? You can ask me about:<br/>
+                • 🏠 Finding the nearest shelter<br/>
+                • 🗺️ Which roads are safe to travel<br/>
+                • 🏥 Medical help and first aid<br/>
+                • 📦 Emergency supplies needed<br/>
+                • 🚶 Evacuation procedures
+              </div>
+              <div class="message-time">Just now · DisasterGuard</div>
+            </div>
+          </div>
+        </div>
+        <div class="chat-suggestions" id="chatSuggestions"></div>
+        <div class="chat-input-area">
+          <div class="chat-input-wrap">
+            <input type="text" class="chat-input" id="chatInput" placeholder="Ask DisasterGuard anything..." onkeydown="handleChatKeydown(event)" />
+            <button class="chat-send-btn" id="chatSendBtn" onclick="sendMessage()">
+              <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
+                <path d="M22 2L11 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <svg viewBox="0 0 40 40" fill="none" width="32" height="32">
+            <circle cx="20" cy="20" r="18" stroke="#ff3b30" stroke-width="2"/>
+            <path d="M20 8 L20 32 M8 20 L32 20" stroke="#ff3b30" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="20" cy="20" r="5" fill="#ff3b30"/>
+          </svg>
+          <span style="font-size:18px;font-weight:800">DisasterGuard</span>
+        </div>
+        <p class="footer-desc">Emergency Response &amp; Disaster Assistant built for the <strong>Agents for Good</strong> track. Helping communities survive and recover from disasters.</p>
+        <div class="footer-tags">
+          <span class="footer-tag">🌊 Floods</span>
+          <span class="footer-tag">🏔️ Earthquakes</span>
+          <span class="footer-tag">🌀 Cyclones</span>
+          <span class="footer-tag">🚨 Accidents</span>
+        </div>
+      </div>
+      <div class="footer-links-group">
+        <div class="footer-col">
+          <h4 class="footer-col-title">Quick Access</h4>
+          <a onclick="scrollToSection('dashboard')">Live Dashboard</a>
+          <a onclick="scrollToSection('shelters')">Shelter Finder</a>
+          <a onclick="scrollToSection('livemap')">Interactive Map</a>
+          <a onclick="scrollToSection('medical')">Medical Help</a>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-col-title">Resources</h4>
+          <a onclick="scrollToSection('supplies')">Supplies Checklist</a>
+          <a onclick="scrollToSection('evacuation')">Evacuation Guide</a>
+          <a onclick="scrollToSection('community')">Community Reports</a>
+          <a onclick="scrollToSection('assistant')">AI Assistant</a>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-col-title">Emergency Numbers</h4>
+          <a onclick="callNumber('112')">🚨 112 — National Emergency</a>
+          <a onclick="callNumber('108')">🚑 108 — Ambulance</a>
+          <a onclick="callNumber('101')">🔥 101 — Fire Brigade</a>
+          <a onclick="callNumber('1078')">🛡️ 1078 — NDRF</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 DisasterGuard · Built for Agents for Good · Capstone Project</span>
+      <span>Stay Safe. Act Fast. Save Lives. 🛡️</span>
+    </div>
+  </footer>
+
+  <!-- SOS MODAL -->
+  <div class="modal-overlay" id="sosModal" style="display:none">
+    <div class="modal-box sos-modal">
+      <div class="sos-modal-icon">🆘</div>
+      <h2 class="sos-modal-title">SOS Activated!</h2>
+      <p class="sos-modal-desc">Your emergency signal has been broadcast. Help is being dispatched to your location.</p>
+      <div class="sos-countdown" id="sosCountdown">Connecting to rescue services... <span id="sosTimer">10</span>s</div>
+      <div class="sos-actions">
+        <div class="sos-action-item"><div class="sos-action-icon">📍</div><div class="sos-action-text">Location shared with NDRF &amp; Emergency Services</div></div>
+        <div class="sos-action-item"><div class="sos-action-icon">📱</div><div class="sos-action-text">Nearest rescue team notified</div></div>
+        <div class="sos-action-item"><div class="sos-action-icon">🚑</div><div class="sos-action-text">Ambulance dispatched — ETA: ~12 minutes</div></div>
+      </div>
+      <button class="modal-close-btn" onclick="closeSOS()">I'm Safe — Cancel SOS</button>
+      <a class="modal-call-btn" href="tel:112">📞 Call 112 Now</a>
+    </div>
+  </div>
+
+  <!-- SHELTER DETAIL MODAL -->
+  <div class="modal-overlay" id="shelterModal" style="display:none">
+    <div class="modal-box shelter-modal-box">
+      <button class="modal-x" onclick="closeModal('shelterModal')">✕</button>
+      <div id="shelterModalContent"></div>
+    </div>
+  </div>
+
+  <!-- COMMUNITY REPORT MODAL -->
+  <div class="modal-overlay" id="reportModal" style="display:none">
+    <div class="modal-box report-modal-box">
+      <button class="modal-x" onclick="closeModal('reportModal')">✕</button>
+      <h2 style="font-size:20px;font-weight:800;margin-bottom:6px">📢 Submit Community Report</h2>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:20px">Help others by reporting what you see on the ground</p>
+      <div class="report-form" id="reportForm">
+        <div class="form-group">
+          <label class="form-label">Report Type</label>
+          <div class="report-type-btns" id="reportTypeBtns">
+            <button class="rtype-btn active" data-type="road">🛣️ Road</button>
+            <button class="rtype-btn" data-type="flood">🌊 Flood</button>
+            <button class="rtype-btn" data-type="shelter">🏠 Shelter</button>
+            <button class="rtype-btn" data-type="medical">🏥 Medical</button>
+            <button class="rtype-btn" data-type="rescue">🚁 Rescue</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Location</label>
+          <input type="text" class="form-input" id="reportLocation" placeholder="Area / Landmark / Address..." />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Severity</label>
+          <select class="form-input" id="reportSeverity">
+            <option value="low">🟡 Low — Informational</option>
+            <option value="medium" selected>🟠 Medium — Needs Attention</option>
+            <option value="high">🔴 High — Urgent</option>
+            <option value="critical">🚨 Critical — Life Threatening</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea class="form-input form-textarea" id="reportDesc" placeholder="Describe what you see — be specific about location and conditions..."></textarea>
+        </div>
+        <button class="submit-report-btn" onclick="submitReport()">📤 Submit Report</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
