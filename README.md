@@ -1,4 +1,4 @@
-DisasterGuard: Intelligent Disaster Management System
+## DisasterGuard: Intelligent Disaster Management System
 
 DisasterGuard is a static web application designed to deliver fast, accessible disaster response support. It offers real-time disaster selector controls, emergency action shortcuts, live disaster status, maps, shelter links, medical response tools, volunteer task access, and an AI assistant for guidance.
 
