@@ -28,6 +28,9 @@ The website demo includes the following screenshot views:
 - **Hero Dashboard:** Shows the disaster selector, SOS action, quick action cards, and current alert status.
 - **Live Response Dashboard:** Displays real-time metrics for affected people, shelters, teams, rescue operations, hospitals, and road closures.
 - **Interactive Live Map and Many Other Things :** Shows active shelter locations, safe routes, hazard zones, and the user location marker.
+
+- <img width="1903" height="910" alt="Screenshot 2026-06-28 212233" src="https://github.com/user-attachments/assets/14e471a2-3498-4e9c-abd5-b31042c22d92" />
+
 - <img width="1301" height="762" alt="Screenshot 2026-06-28 212319" src="https://github.com/user-attachments/assets/4cbecccb-829c-4dfb-99bb-b08185e555e9" />
 
 <img width="1308" height="626" alt="Screenshot 2026-06-28 212408" src="https://github.com/user-attachments/assets/53a21e25-1cc1-4cf5-86fa-1e8f584642d1" />
