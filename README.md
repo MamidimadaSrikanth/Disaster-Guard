@@ -116,7 +116,8 @@ python -m http.server 8080
 http://localhost:8080
 ```
 
-### Option 3: Use Visual Studio Code Live Server
+### Option 3: Use Visual Studio Code Live Server or Any other Editiors
+
 1. Install the Live Server extension in VS Code.
 2. Open the project folder.
 3. Right-click `index.html` and choose `Open with Live Server`.
@@ -133,6 +134,14 @@ http://localhost:8080
    - `Volunteer Task` to join disaster response activities.
    - `AI Assistant` to ask questions and get guidance.
 5. Review the live disaster status panel for affected population, shelter counts, and team deployment.
+
+## Demo Screenshots of Website
+
+The website demo includes the following screenshot views:
+
+- **Hero Dashboard**: Shows the disaster selector, SOS action, quick action cards, and current alert status.
+- **Live Response Dashboard**: Displays real-time metrics for affected people, shelters, teams, rescue operations, hospitals, and road closures.
+- **Interactive Live Map**: Shows active shelter locations, safe routes, hazard zones, and the user location marker.
 
 ## Efficiency Considerations
 
