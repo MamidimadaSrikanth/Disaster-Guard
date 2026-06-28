@@ -21,6 +21,14 @@ DisasterGuard solves this by providing a polished, single-page dashboard that co
 
 - Live app URL (GitHub Pages): https://mamidimadasrikanth.github.io/Disaster-Guard/
 
+## Demo Screenshots of Website
+
+The website demo includes the following screenshot views:
+
+- **Hero Dashboard:** Shows the disaster selector, SOS action, quick action cards, and current alert status.
+- **Live Response Dashboard:** Displays real-time metrics for affected people, shelters, teams, rescue operations, hospitals, and road closures.
+- **Interactive Live Map:** Shows active shelter locations, safe routes, hazard zones, and the user location marker.
+
 ## Key Features
 
 - Disaster type selector with icon-rich buttons
